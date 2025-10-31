@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jeux Samsung</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5faff;
+      color: #0d1f47;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 { color: #004bb5; }
+    .btn {
+      background-color: #004bb5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .hidden { display: none; }
+    .question-box {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jeux Samsung</h1>
+  <div id="start-screen">
+    <button class="btn" onclick="startGame()">Commencer</button>
+  </div>
+
+  <div id="game-screen" class="hidden">
+    <div id="question-box" class="question-box"></div>
+    <div id="buttons-box"></div>
+  </div>
+
+  <div id="end-screen" class="hidden">
+    <h2>Bravo ! 🎉</h2>
+    <p>Tu as terminé les jeux Samsung.</p>
+    <button class="btn" onclick="location.reload()">Recommencer</button>
+  </div>
+
+  <script>
+    const jeux = [
+      {
+        type: 'quiz',
+        questions: [
+          {
+            question: "En quelle année Samsung a été fondée ?",
+            options: ["1938", "1948", "1958", "1968"],
+            answer: "1938"
+          },
+          {
+            question: "Quel est le slogan actuel de Samsung ?",
+            options: ["Inspire the World", "Do What You Can’t", "Think Different", "Impossible Is Nothing"],
+            answer: "Do What You Can’t"
+          },
+          {
+            question: "Samsung est originaire de quel pays ?",
+            options: ["Japon", "Chine", "Corée du Sud", "USA"],
+            answer: "Corée du Sud"
+          }
+        ]
+      },
+      {
+        type: 'vrai-faux',
+        questions: [
+          {
+            statement: "Samsung produit des télévisions.",
+            answer: true
+          },
+          {
+            statement: "Samsung est une marque française.",
+            answer: false
+          },
+          {
+            statement: "Samsung fabrique aussi des électroménagers.",
+            answer: true
+          }
+        ]
+      },
+      {
+        type: 'devinette',
+        questions: [
+          {
+            riddle: "Je suis un appareil que tu tiens dans ta main. Je suis intelligent et je t’aide à appeler, photographier, et naviguer. Qui suis‑je ?",
+            answer: "smartphone"
+          }
+        ]
+      }
+    ];
+
+    let currentGameIndex = 0;
+    let currentQuestionIndex = 0;
+
+    function startGame() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      showNextQuestion();
+    }
+
+    function showNextQuestion() {
+      const game = jeux[currentGameIndex];
+      const qBox = document.getElementById('question-box');
+      const bBox = document.getElementById('buttons-box');
+      qBox.innerHTML = '';
+      bBox.innerHTML = '';
+
+      if (currentQuestionIndex >= game.questions.length) {
+        // fin de ce jeu, passe au jeu suivant
+        currentGameIndex++;
+        currentQuestionIndex = 0;
+        if (currentGameIndex >= jeux.length) {
+          endGame();
+          return;
+        }
+        showNextQuestion();
+        return;
+      }
+
+      const q = game.questions[currentQuestionIndex];
+      if (game.type === 'quiz') {
+        qBox.innerText = q.question;
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.classList.add('btn');
+          btn.innerText = opt;
+          btn.onclick = () => {
+            if (opt === q.answer) {
+              alert("Bonne réponse !");
+            } else {
+              alert("Mauvaise réponse. La bonne réponse est : " + q.answer);
+            }
+            currentQuestionIndex++;
+            showNextQuestion();
+          };
+          bBox.appendChild(btn);
+        });
+      } else if (game.type === 'vrai-faux') {
+        qBox.innerText = q.statement;
+        ['Vrai', 'Faux'].forEach(opt => {
+          const btn = document.createElement('button');
+          btn.classList.add('btn');
+          btn.innerText = opt;
+          btn.onclick = () => {
+            const userAns = (opt === 'Vrai');
+            if (userAns === q.answer) {
+              alert("✔️ Correct !");
+            } else {
+              alert("❌ Incorrect !");
+            }
+            currentQuestionIndex++;
+            showNextQuestion();
+          };
+          bBox.appendChild(btn);
+        });
+      } else if (game.type === 'devinette') {
+        qBox.innerText = q.riddle;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Votre réponse...';
+        bBox.appendChild(input);
+        const btn = document.createElement('button');
+        btn.classList.add('btn');
+        btn.innerText = 'Valider';
+        btn.onclick = () => {
+          const ans = input.value.trim().toLowerCase();
+          if (ans === q.answer.toLowerCase()) {
+            alert("Bravo !");
+          } else {
+            alert("Non, la réponse est : " + q.answer);
+          }
+          currentQuestionIndex++;
+          showNextQuestion();
+        };
+        bBox.appendChild(btn);
+      }
+    }
+
+    function endGame() {
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('end-screen').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
